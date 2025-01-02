@@ -1,14 +1,35 @@
 import Header from "./Header";
-import { StrictMode, useEffect } from "react";
+import { StrictMode, useEffect, useReducer } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import Main from "./main";
 
-function App() {
+const initialState = {
+  questions: [],
+  // 'loading', 'error', 'ready', 'active','finished'
+  status: "loading",
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "dataRecieved":
+      return {
+        ...state,
+        questions: action.payload,
+        status: "ready",
+      };
+    default:
+      throw new Error("Unknown Action");
+  }
+}
+
+export default function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   useEffect(function () {
     fetch("http://localhost:8000/questions")
       .then((res) => res.json())
-      .then((data) => console.log(data))
+      .then((data) => dispatch({ type: "dataRecieved", payload: data }))
       .catch((err) => console.error("Error"));
   }, []);
   return (
@@ -23,7 +44,6 @@ function App() {
   );
 }
 
-export default App;
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />

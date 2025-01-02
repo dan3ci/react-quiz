@@ -18,6 +18,11 @@ function reducer(state, action) {
         questions: action.payload,
         status: "ready",
       };
+    case "dataFailed":
+      return {
+        ...state,
+        status: "error",
+      };
     default:
       throw new Error("Unknown Action");
   }
@@ -30,7 +35,7 @@ export default function App() {
     fetch("http://localhost:8000/questions")
       .then((res) => res.json())
       .then((data) => dispatch({ type: "dataRecieved", payload: data }))
-      .catch((err) => console.error("Error"));
+      .catch((err) => dispatch({ type: "dataFailed" }));
   }, []);
   return (
     <div className="app">
